@@ -9,6 +9,7 @@ import { AcDbLibreDwgConverter } from '@mlightcad/libredwg-converter'
 
 import App from './App.vue'
 import './styles.css'
+import { isBareMode, startBareMode } from './bare'
 
 /* ------------------------------------------------------------------ *
  * 1) 修掉查看器标题栏里的中文乱码
@@ -78,13 +79,42 @@ AcDbDatabaseConverterManager.instance.register(
   })
 )
 
-/* 与同源下的其他产品隔离界面偏好 */
-AcApSettingManager.configure({ storageKey: 'fnos.dwg.viewer.settings' })
+/* ------------------------------------------------------------------ *
+ * 3) 界面偏好存储键
+ *
+ * ★ 为什么裸模式要用独立的 key ★
+ *   查看器把界面状态（图层面板是否展开、侧栏宽窄…）存在
+ *   AcApSettingManager 指定的 storageKey 下，**跨文档共用**。
+ *   于是"在飞牛里双击图纸"用过的状态会被"思源嵌入块"继承 ——
+ *   而嵌入块里那些开关按钮已被裸模式藏掉，等于留下一堆
+ *   "看不见开关的开关"：面板开着，用户却找不到关它的入口。
+ *   两边各存各的，互不污染；裸模式永远是干净的默认界面。
+ *
+ * ★ 顺序 ★
+ *   必须在 app.mount 之前 configure：设置管理器是单例，
+ *   组件初始化时就已经按当时的 key 读过一次了。
+ * ------------------------------------------------------------------ */
+AcApSettingManager.configure({
+  storageKey: isBareMode ? 'fnos.dwg.viewer.settings.bare' : 'fnos.dwg.viewer.settings'
+})
 
+/* ------------------------------------------------------------------ *
+ * 2) 挂载 + 裸模式
+ *
+ * ★ import { startBareMode } 放在文件末尾、mount 之前 ★
+ *   不是为了代码顺序好看：bare.ts 在**模块顶层**就给 <html> 挂
+ *   data-fnos-bare 属性，而本文件的 import 全部先于 mount 执行 ——
+ *   于是外壳第一次被 Vue 建出来时就带着 bare.css 的样式，不会闪一下
+ *   完整界面。ESM 的 import 会被提前提升，所以这行写在文件哪个位置
+ *   都不影响"早于 mount"这件事，但放在这里读起来最顺。
+ * ------------------------------------------------------------------ */
 const app = createApp(App)
 app.use(ElementPlus)
 app.use(i18n)
 app.mount('#app')
+
+/* 裸模式的几何兜底：观察 8 秒，把后到的外壳浮层也藏掉 */
+startBareMode()
 
 /* 带 ?debug=1 打开时把管理器挂到 window，方便排查图纸打不开/取景异常 */
 if (new URLSearchParams(window.location.search).has('debug')) {
