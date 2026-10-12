@@ -1,0 +1,35 @@
+# fnOS（飞牛私有云）Docker 部署配置
+#
+# 用法（在 fnOS 的 SSH 里，或 Docker 管理界面的「Compose」页面上执行）：
+#   1. 把整个项目目录上传到 NAS，例如 /vol1/1000/docker/fnos-dwg-viewer
+#   2. cd /vol1/1000/docker/fnos-dwg-viewer && docker compose up -d --build
+#   3. 浏览器打开 http://飞牛IP:8020
+#
+# 注意：卷的挂载路径要按你实际的存储空间改（fnOS 默认是 /vol1、/vol2…）
+
+services:
+  fnos-dwg-viewer:
+    build: .
+    image: fnos-dwg-viewer:1.0.0
+    container_name: fnos-dwg-viewer
+    restart: unless-stopped
+    ports:
+      - "8020:8020"
+    environment:
+      PORT: "8020"
+      # 容器内看到的"本机存储"根目录，下面把 NAS 存储挂到这里
+      LOCAL_ROOT: "/data"
+      # 允许读取的绝对路径白名单（文件管理器双击打开时会传来 /vol1/... 这种绝对路径）
+      ALLOW_PREFIXES: "/data,/vol1,/vol2"
+      # 可选：想直接连别的机器的 WebDAV，取消注释即可（前端也可现场填）
+      # FNOS_URL: "http://192.168.1.10:5005"
+      # FNOS_USER: "你的账号"
+      # FNOS_PASS: "你的密码"
+      # 自签名证书的 HTTPS WebDAV 需要打开
+      # FNOS_INSECURE_TLS: "1"
+    volumes:
+      # 只读挂载，看图器不会修改你的图纸
+      - /vol1:/data/vol1:ro
+      - /vol2:/data/vol2:ro
+      # 如果你把图纸统一放在某个共享文件夹，也可以只挂这一个，更清爽：
+      # - /vol1/1000/图纸:/data/图纸:ro
