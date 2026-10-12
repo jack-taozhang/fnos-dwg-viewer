@@ -1,0 +1,7 @@
+{
+  "defaults": {
+    "run-as": "root"
+  },
+  "username": "fnos-dwg-viewer",
+  "groupname": "fnos-dwg-viewer"
+}
