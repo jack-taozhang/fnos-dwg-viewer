@@ -1,0 +1,100 @@
+/* ------------------------------------------------------------------ *
+ * 「裸模式」（?bare=1）—— 由本应用自己藏掉查看器外壳
+ *
+ * ★ 为什么需要它 ★
+ *   思源插件（siyuan-localfs）把本应用借给「CAD 嵌入块」当预览用，
+ *   它想要的效果是"只有图纸、没有工具栏"。同源时它能进 iframe 注入
+ *   样式（见那边的 src/purify.js CAD_CSS）；**跨源时注入会被浏览器
+ *   静默丢弃** —— 思源**桌面客户端**就是跨源（宿主页在 127.0.0.1:6806，
+ *   iframe 在 NAS:6806），于是工具栏全冒出来，而且不报任何错。
+ *   同源策略没有第三条路：宿主页要么同源，要么什么都做不了。
+ *   所以正解是**让本应用自己认一个 URL 参数**，不依赖宿主页注入 ——
+ *   `?bare=1` 就是这个约定。
+ *
+ * ★ 为什么要放在 CSS 里，而不是给 MlCadViewer 传 prop ★
+ *   上游 @mlightcad/cad-viewer 1.7.4 **没有**任何隐藏外壳的官方 prop
+ *   （Props 里只有 disableExport 这类"功能裁剪"，见其 MlCadViewer.vue.d.ts）。
+ *   也就是说没有"官方开关"可用，只能藏 DOM。
+ *
+ * ★ 抗上游升级的设计 ★
+ *   上游随时可能改类名。整套机制因此分成三层，从稳到脆依次兜底：
+ *     ① 本文件：按类名隐藏 —— 精确，但依赖上游类名（最脆的一层）
+ *     ② src/bare.ts：几何兜底 —— 藏掉「画布以外、贴在视口四边的东西」，
+ *        不认任何类名，只认"谁占了边"（抗改名）
+ *     ③ 思源插件侧注入 —— 同源场景下的双保险，CSS 与那边的 CAD_CSS 保持一致
+ *   三层任一生效即可。**升级上游后请跑 `npm run check:bare`**
+ *   （它会枚举真实 DOM 里的 ml-* 类名，跟这里的选择器清单比对，
+ *   告诉你哪些规则已经打空 —— 那是该补 ① 的时候）。
+ *
+ * ★ 作用域限定 ★
+ *   所有规则都以 `html[data-fnos-bare]` 开头。只在带 ?bare=1 时
+ *   由 src/bare.ts 给 <html> 挂上这个属性，因此：
+ *     - 正常「双击图纸打开」入口完全不受影响（属性不存在，一条都不匹配）
+ *     - 不需要把整段规则写成 `.app *{}` 之类宽泛选择器
+ * ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ *
+ * ① 按类名隐藏（精确层）
+ *
+ * 类名来源见 UPGRADING.md「与思源侧的联动」一节，
+ * 其中 ml-cad-header / ml-status-bar / ml-cli-container /
+ * ml-vertical-toolbar-host 是真机实测名，其余是留作无损的候选。
+ * ------------------------------------------------------------------ */
+
+html[data-fnos-bare] .ml-cad-header,
+html[data-fnos-bare] .ml-cad-footer,
+html[data-fnos-bare] .ml-status-bar,
+html[data-fnos-bare] .ml-ribbon-toolbar-container,
+html[data-fnos-bare] .ml-cli-container,
+html[data-fnos-bare] .ml-cli-wrapper,
+html[data-fnos-bare] .ml-cli-bar,
+html[data-fnos-bare] .ml-vertical-toolbar-host,
+html[data-fnos-bare] .ml-ex-ui-toolbar-host,
+html[data-fnos-bare] .ml-ex-ui-toolbar,
+html[data-fnos-bare] .ml-ui-shortcut-toolbar-shell,
+html[data-fnos-bare] .ml-ui-shortcut-toolbar,
+html[data-fnos-bare] .ml-entity-properties-wrapper,
+html[data-fnos-bare] .ml-layer-manager-panel,
+html[data-fnos-bare] .ml-layer-list-wrapper,
+html[data-fnos-bare] .ml-character-map-magnifier,
+html[data-fnos-bare] .ml-ui-notification-center {
+  display: none !important;
+}
+
+/*
+ * 让位的两个 CSS 变量归零。
+ * 查看器用 --ml-header-height / --ml-status-bar-height 给图面留出空间，
+ * 不归零的话画布顶部会空一条。
+ */
+html[data-fnos-bare] {
+  --ml-header-height: 0px !important;
+  --ml-status-bar-height: 0px !important;
+}
+
+/* 画布铺满：容器四边钉死。
+ * 之所以四条边都钉而不只靠上面的变量，是因为 ml-cad-main 的 top
+ * 是由 --ml-header-height 算出来的，那个变量哪天不被采纳就白藏了 ribbon。 */
+html[data-fnos-bare] .ml-cad-main,
+html[data-fnos-bare] .ml-cad-container,
+html[data-fnos-bare] .ml-cad-viewer-container {
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* 几何兜底命中后由 src/bare.ts 挂上这个属性。
+ * 用属性而不是 inline style：inline 会盖掉一切（含 !important 之外的任何
+ * 未来规则），而这里只是"额外再压一票"，保持层叠可读、可覆盖。 */
+html[data-fnos-bare] [data-fnos-bare-hidden] {
+  display: none !important;
+}
+
+html[data-fnos-bare],
+html[data-fnos-bare] body,
+html[data-fnos-bare] #app {
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
