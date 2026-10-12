@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# 安装完成后（fnOS 已把应用文件写入 TRIM_APPDEST）
+#
+# 做三件事：准备运行期数据目录、记安装日志、确保服务是起来的。
+#
+# 关于最后一件：应用中心通常会在安装末尾自行调用 `main start`，
+# 但那一步失败时它未必会提示，用户看到的就是"装好了但显示已停用"。
+# 这里主动拉一次（cmd/main 是幂等的，已经在跑就什么都不做）。
+
+PKGVAR="${TRIM_PKGVAR:-/tmp/${TRIM_APPNAME:-fnos-dwg-viewer}}"
+LOG_FILE="${PKGVAR}/app.log"
+
+log_msg() {
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - [install_callback] $1" >> "$LOG_FILE"
+}
+
+mkdir -p "$PKGVAR" 2>/dev/null
+touch "$LOG_FILE" 2>/dev/null
+
+# 清理可能残留的 PID（覆盖安装 / 重装场景）
+rm -f "${PKGVAR}/app.pid" 2>/dev/null
+
+log_msg "安装完成：版本 ${TRIM_APPVER:-未知}，应用目录 ${TRIM_APPDEST:-未知}"
+if grep -q '"run-as"[[:space:]]*:[[:space:]]*"root"' "${TRIM_APPDEST}/config/privilege" 2>/dev/null; then
+  log_msg "root 权限版：进程以 root 运行，可直接读取全部存储空间，不需要授权任何目录。"
+else
+  # 正常包不该出现这种情况（build-fpk 会拦住），留个明确的日志便于排障
+  log_msg "⚠ 未检测到 run-as: root，本应用需要 root 才能读取用户文件，请确认包未被改动。"
+fi
+
+MAIN="${TRIM_APPDEST}/cmd/main"
+if [ -x "$MAIN" ]; then
+  if "$MAIN" start >> "$LOG_FILE" 2>&1; then
+    log_msg "安装后服务已启动"
+  else
+    log_msg "安装后自动启动未成功，可到应用中心手动点启动（日志：$LOG_FILE）"
+  fi
+fi
+
+# 把「打开方式」入口改成 url 型，并去掉桌面图标入口。
+# 应用中心对第三方包只会建 iframe 型服务（硬编码），装完必须自己改库，
+# 否则双击图纸会嵌在飞牛桌面窗口里而不是用浏览器打开。详见该脚本头部注释。
+FIX="${TRIM_APPDEST}/cmd/fix-open-type"
+if [ -x "$FIX" ]; then
+  "$FIX" >> "$LOG_FILE" 2>&1
+fi
+
+echo "CAD 看图安装完成：在文件管理器里双击任意位置的 .dwg / .dxf 即可打开，不需要配置授权目录。"
+exit 0
