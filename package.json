@@ -1,7 +1,7 @@
 {
   "name": "fnos-dwg-viewer",
   "private": true,
-  "version": "1.0.9",
+  "version": "1.0.10",
   "type": "module",
   "description": "fnOS（飞牛私有云）上的 DWG/DXF 在线看图器 —— 基于 @mlightcad/cad-viewer 1.7.4",
   "scripts": {
@@ -15,6 +15,7 @@
     "e2e": "node scripts/e2e-local.mjs",
     "e2e:all": "node scripts/e2e-allmode.mjs",
     "smoke": "node scripts/smoke-browser.mjs",
+    "check:bare": "node scripts/check-bare.mjs",
     "test:dxf": "node scripts/test-dxf-legacy.mjs",
     "test:path": "node scripts/test-path-utils.mjs",
     "test": "npm run test:path && npm run test:dxf",
