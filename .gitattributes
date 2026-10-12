@@ -1,0 +1,43 @@
+# 行尾与文件属性约定
+#
+# ★ 为什么需要这个文件 ★
+#   Windows 上 git 默认按 core.autocrlf 改行尾，而飞牛（Linux）要求
+#   脚本必须是 LF —— CRLF 的 .sh 会直接报 `bad interpreter: /bin/sh^M`，
+#   而且这种错**只在真机上炸**，本地怎么测都是好的。
+#
+#   默认策略：文本文件按平台习惯（Windows 下 CRLF，Linux/macOS 下 LF）。
+* text=auto
+
+# ---- 必须 LF：shell 脚本 ----
+*.sh    text eol=lf
+
+# ---- 必须 LF：无扩展名的生命周期脚本 ----
+# fnos-package/cmd/ 下全是 install_init / main 这类无扩展名文件，
+# 但它们是 shell 脚本，走的是同一条解释器链路。
+fnos-package/cmd/*        text eol=lf
+fnos-package/cmd/**       text eol=lf
+
+# ---- 二进制：一律不参与行尾转换，也不做 diff ----
+*.wasm  binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.zip   binary
+*.fpk   binary
+*.dxf   binary
+*.dwg   binary
+*.ttf   binary
+*.woff  binary
+*.woff2 binary
+
+# ---- 不做行尾转换的产物 ----
+# 构建产物由 vite 生成，内容本身已经定死；转换只会让本地与 CI 产物不一致。
+dist/**        -text
+public/assets/**  -text
+fnos-package/app/server/** -text
+vendor/**      -text
+
+# ---- 锁文件按原样保留 ----
+package-lock.json -text
