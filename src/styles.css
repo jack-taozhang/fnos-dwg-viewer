@@ -1,0 +1,62 @@
+:root {
+  color-scheme: dark;
+  --bg: #1a1e24;
+  --panel: #20242b;
+  --border: #333943;
+  --text: #e6e6e6;
+  --muted: #7d8794;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+/*
+ * #app 必须显式撑满。
+ *
+ * 坑：查看器 / Element Plus 的全局样式会把 `body` 设成 `display: flex`
+ * （还会给 `html` 加 `.dark`）。此时 `#app` 是 flex item，宽度按内容计算，
+ * 而它内部全是绝对定位元素 —— 内容宽度为 0，于是 `#app` 塌成 0 宽，
+ * 再被 `.app` 的 overflow:hidden 整个裁掉，表现就是"图面一片空白"。
+ */
+#app {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+/*
+ * 1.0.9 起这里不再有「抽屉打开时把绘图区让出来」那条规则 ——
+ * 图纸库抽屉已整体删除，查看器恒定铺满视口。
+ *
+ * 留个记录，免得以后有人想加回侧栏时重复踩：
+ *   查看器把根节点 `.ml-cad-viewer-container` 设成了 `position: fixed; inset: 0`，
+ *   它锚定的是**视口**而不是我们给它的 `.viewer` 容器 —— 所以要让位给侧栏，
+ *   只改 `.viewer` 的 left 完全无效，必须直接改它这个根节点的 inset。
+ */
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #3a414c; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #4a5361; }
+
+/* Element Plus 弹窗跟随深色，避免与查看器主题割裂 */
+.el-overlay { background-color: rgba(0, 0, 0, 0.6); }
