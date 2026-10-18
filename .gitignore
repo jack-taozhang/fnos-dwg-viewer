@@ -24,6 +24,9 @@ vendor/
 # ★ 工作区记忆（可能含真实 NAS 口令与 token）★
 .workbuddy/
 
+# safe-delete 守卫的回收站目录（挪走的 node_modules 之类）
+.trash-*
+
 # 外层目录里的散件（不在本仓库内）
 *.fpk
 shot_*.png
