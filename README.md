@@ -20,7 +20,7 @@ _示例图纸 `sample/sample-plan.dxf`（R12 格式）。上面那条 ribbon 与
 
 |        |                                                                                   |
 | ------ | --------------------------------------------------------------------------------- |
-| 查看器内核  | [`@mlightcad/cad-viewer`](https://github.com/mlightcad/cad-viewer) **1.7.4**（MIT） |
+| 查看器内核  | [`@mlightcad/cad-viewer`](https://github.com/mlightcad/cad-viewer) **1.7.5**（MIT） |
 | DWG 解析 | LibreDWG（WebAssembly，跑在 Web Worker）                                               |
 | 应用形态   | 飞牛原生应用 `.fpk`（`install_dep_apps=nodejs_v22`，`run-as: root`）                     |
 | 后端     | Node.js 内置模块手写，**零第三方依赖**（连 `node_modules` 都不用装）                                     |
@@ -36,7 +36,7 @@ _示例图纸 `sample/sample-plan.dxf`（R12 格式）。上面那条 ribbon 与
 ```bash
 npm install
 npm test             # 路径工具 + 老式 DXF 兼容层自检
-npm run fpk          # 构建前端 → 组装应用包 → 产出 release/fnos-dwg-viewer-1.0.9.fpk
+npm run fpk          # 构建前端 → 组装应用包 → 产出 release/fnos-dwg-viewer-1.7.5.fpk
 ```
 
 脚本会：构建前端 → 把 `dist` 和 `server/*.mjs` 装进 `fnos-package/app/server/` →  
@@ -60,7 +60,7 @@ npm run fpk          # 构建前端 → 组装应用包 → 产出 release/fnos-
 
 ### 2. 在飞牛上安装
 
-fnOS 后台 → **应用中心 → 手动安装** → 选择 `release/fnos-dwg-viewer-1.0.9.fpk`。
+fnOS 后台 → **应用中心 → 手动安装** → 选择 `release/fnos-dwg-viewer-1.7.5.fpk`。
 
 应用中心里的名字就是 **CAD 看图**（桌面不再生成图标，见下面 §3.3）。manifest 里声明了
 `install_dep_apps=nodejs_v22`，飞牛会自动确保系统里的 Node.js v22 运行时可用
@@ -377,7 +377,7 @@ const visible = tab.id === 'measurement' ? true
 
 ## 六、已知限制
 
-以下大多来自 `cad-viewer` 1.7.4 内核自身的边界（最后一行为内核缺陷，本项目已绕过）：
+以下大多来自 `cad-viewer` 1.7.5 内核自身的边界（最后一行为内核缺陷，本项目已绕过）：
 
 | 项目        | 情况                                    |
 | --------- | ------------------------------------- |
