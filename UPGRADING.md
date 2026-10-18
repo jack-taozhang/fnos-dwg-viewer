@@ -11,15 +11,15 @@
 
 | 包 | 当前版本 | 作用 |
 |---|---|---|
-| `@mlightcad/cad-viewer` | 1.7.4 | 查看器外壳（ribbon / 图层 / 命令行 / 状态栏） |
-| `@mlightcad/cad-simple-viewer` | 1.7.4 | `MlCadViewer` 组件与打开模式枚举 |
-| `@mlightcad/cad-agent-plugin` | 1.7.4 | AI agent 插件 |
-| `@mlightcad/cad-html-plugin` | 1.7.4 | 导出 HTML |
-| `@mlightcad/cad-svg-plugin` | 1.7.4 | 导出 SVG |
-| `@mlightcad/cad-pdf-plugin` | 1.7.4 | 导出 PDF |
-| `@mlightcad/three-renderer` | 1.7.4 | WebGL 渲染 |
-| `@mlightcad/pdf-renderer` | 1.7.4 | PDF 渲染 |
-| `@mlightcad/data-model` | ^1.15.1 | 数据模型 |
+| `@mlightcad/cad-viewer` | 1.7.5 | 查看器外壳（ribbon / 图层 / 命令行 / 状态栏） |
+| `@mlightcad/cad-simple-viewer` | 1.7.5 | `MlCadViewer` 组件与打开模式枚举 |
+| `@mlightcad/cad-agent-plugin` | 1.7.5 | AI agent 插件 |
+| `@mlightcad/cad-html-plugin` | 1.7.5 | 导出 HTML |
+| `@mlightcad/cad-svg-plugin` | 1.7.5 | 导出 SVG |
+| `@mlightcad/cad-pdf-plugin` | 1.7.5 | 导出 PDF |
+| `@mlightcad/three-renderer` | 1.7.5 | WebGL 渲染 |
+| `@mlightcad/pdf-renderer` | 1.7.5 | PDF 渲染 |
+| `@mlightcad/data-model` | ^1.15.3 | 数据模型 |
 | `@mlightcad/libredwg-converter` | ^3.15.2 | DWG → 中间格式转换（WASM） |
 
 > ★ 注意：`dependencies` 是空的，全部走 `devDependencies` ——
@@ -129,7 +129,7 @@ M 明显变小、或边缘检出残留外壳，就去 `docs/` 里翻 `screenshot
   删掉任何一层都会让某些场景退化。
 
 > ★ 为什么不给 `MlCadViewer` 传 prop 来隐藏 ★
->   上游 1.7.4 **没有**任何隐藏外壳的官方 prop（`MlCadViewer.vue.d.ts` 的 Props 里
+>   上游 1.7.5 **没有**任何隐藏外壳的官方 prop（`MlCadViewer.vue.d.ts` 的 Props 里
 >   只有 `disableExport` 这类"功能裁剪"）。所以只能藏 DOM。
 >   将来若上游补了官方开关，优先改用官方 prop，并把 ① ② 降级为兼容旧版本。
 
@@ -201,9 +201,9 @@ storageKey: isBareMode ? 'fnos.dwg.viewer.settings.bare' : 'fnos.dwg.viewer.sett
 
 | 文件 | 字段 |
 |---|---|
-| `package.json` | `version`（当前 1.0.10） |
+| `package.json` | `version`（当前 1.7.5） |
 | `fnos-package/manifest` | `version` |
-| （若已发版）GitHub Release tag | `v1.0.x` |
+| （若已发版）GitHub Release tag | `v1.7.x` |
 
 `scripts/build-fpk.mjs` 在打包时会校验这一致性。
 
