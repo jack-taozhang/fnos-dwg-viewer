@@ -1,0 +1,106 @@
+:root {
+  color-scheme: dark;
+  --bg: #1a1e24;
+  --panel: #20242b;
+  --border: #333943;
+  --text: #e6e6e6;
+  --muted: #7d8794;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+#app {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a414c;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a5361;
+}
+
+.el-overlay {
+  background-color: #0009;
+}
+
+/* ── 裸模式：只留图纸 ─────────────────────────────────────────────
+   已知的查看器外壳类名直接隐藏；几何兜底标记的 [data-fnos-bare-hidden]
+   也在这里生效。 */
+html[data-fnos-bare] .ml-cad-header,
+html[data-fnos-bare] .ml-cad-footer,
+html[data-fnos-bare] .ml-status-bar,
+html[data-fnos-bare] .ml-ribbon-toolbar-container,
+html[data-fnos-bare] .ml-cli-container,
+html[data-fnos-bare] .ml-cli-wrapper,
+html[data-fnos-bare] .ml-cli-bar,
+html[data-fnos-bare] .ml-vertical-toolbar-host,
+html[data-fnos-bare] .ml-ex-ui-toolbar-host,
+html[data-fnos-bare] .ml-ex-ui-toolbar,
+html[data-fnos-bare] .ml-ui-shortcut-toolbar-shell,
+html[data-fnos-bare] .ml-ui-shortcut-toolbar,
+html[data-fnos-bare] .ml-entity-properties-wrapper,
+html[data-fnos-bare] .ml-layer-manager-panel,
+html[data-fnos-bare] .ml-layer-list-wrapper,
+html[data-fnos-bare] .ml-character-map-magnifier,
+html[data-fnos-bare] .ml-ui-notification-center {
+  display: none !important;
+}
+
+html[data-fnos-bare] {
+  --ml-header-height: 0px !important;
+  --ml-status-bar-height: 0px !important;
+}
+
+html[data-fnos-bare] .ml-cad-main,
+html[data-fnos-bare] .ml-cad-container,
+html[data-fnos-bare] .ml-cad-viewer-container {
+  inset: 0 !important;
+}
+
+html[data-fnos-bare] [data-fnos-bare-hidden] {
+  display: none !important;
+}
+
+html[data-fnos-bare],
+html[data-fnos-bare] body,
+html[data-fnos-bare] #app {
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
