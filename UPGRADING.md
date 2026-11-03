@@ -11,14 +11,14 @@
 
 | 包 | 当前版本 | 作用 |
 |---|---|---|
-| `@mlightcad/cad-viewer` | 1.7.5 | 查看器外壳（ribbon / 图层 / 命令行 / 状态栏） |
-| `@mlightcad/cad-simple-viewer` | 1.7.5 | `MlCadViewer` 组件与打开模式枚举 |
-| `@mlightcad/cad-agent-plugin` | 1.7.5 | AI agent 插件 |
-| `@mlightcad/cad-html-plugin` | 1.7.5 | 导出 HTML |
-| `@mlightcad/cad-svg-plugin` | 1.7.5 | 导出 SVG |
-| `@mlightcad/cad-pdf-plugin` | 1.7.5 | 导出 PDF |
-| `@mlightcad/three-renderer` | 1.7.5 | WebGL 渲染 |
-| `@mlightcad/pdf-renderer` | 1.7.5 | PDF 渲染 |
+| `@mlightcad/cad-viewer` | 1.7.6 | 查看器外壳（ribbon / 图层 / 命令行 / 状态栏） |
+| `@mlightcad/cad-simple-viewer` | 1.7.6 | `MlCadViewer` 组件与打开模式枚举 |
+| `@mlightcad/cad-agent-plugin` | 1.7.6 | AI agent 插件 |
+| `@mlightcad/cad-html-plugin` | 1.7.6 | 导出 HTML |
+| `@mlightcad/cad-svg-plugin` | 1.7.6 | 导出 SVG |
+| `@mlightcad/cad-pdf-plugin` | 1.7.6 | 导出 PDF |
+| `@mlightcad/three-renderer` | 1.7.6 | WebGL 渲染 |
+| `@mlightcad/pdf-renderer` | 1.7.6 | PDF 渲染 |
 | `@mlightcad/data-model` | ^1.15.3 | 数据模型 |
 | `@mlightcad/libredwg-converter` | ^3.15.2 | DWG → 中间格式转换（WASM） |
 
@@ -81,7 +81,7 @@ node scripts/check-bare.mjs "http://127.0.0.1:8020/open?bare=1&path=<某张真�
 它做两件事：
 
 1. **断言**：裸模式下视口四边不该有任何可见外壳元素；
-2. **诊断**：枚举真实 DOM 里所有 `ml-*` 类名，跟 `src/bare.css` 的选择器清单
+2. **诊断**：枚举真实 DOM 里所有 `ml-*` 类名，跟 `src/style.css` 的选择器清单
    逐条比对，打印「哪些规则打空了」和「哪些类名是新出现的、清单没覆盖」。
 
 > ★ 脚本刻意**先判页面有没有真的加载出来** ★
@@ -91,7 +91,7 @@ node scripts/check-bare.mjs "http://127.0.0.1:8020/open?bare=1&path=<某张真�
 > ★ 它会打印一长串未覆盖的 `ml-*` 类名 ★
 >   那不是失败，是**事实呈现**（很多是弹窗/下拉的内部类，本来就不该藏）。
 >   要做的是人工扫一眼：里面有没有**新的外壳类**（ribbon / toolbar / status-bar
->   这类贴在视口边缘的名字）。有就补进 `src/bare.css` 的清单。
+>   这类贴在视口边缘的名字）。有就补进 `src/style.css` 里 `html[data-fnos-bare]` 那组规则。
 
 **升级后的标准动作**：跑一次 `check:bare`，若「清单 N 条，本次命中 M 条」里
 M 明显变小、或边缘检出残留外壳，就去 `docs/` 里翻 `screenshot-bare.png` 对照实图。
@@ -117,7 +117,7 @@ M 明显变小、或边缘检出残留外壳，就去 `docs/` 里翻 `screenshot
 
 | 层 | 位置 | 认什么 | 抗上游改名？ |
 |---|---|---|---|
-| ① 精确层 | `src/bare.css` | 上游类名（`ml-cad-header` 等） | ❌ 最脆，改名即失效 |
+| ① 精确层 | `src/style.css` 的 `html[data-fnos-bare]` 规则 | 上游类名（`ml-cad-header` 等） | ❌ 最脆，改名即失效 |
 | ② 几何层 | `src/bare.ts` 的 `sweep()` | **只看几何**：盖住视口八成宽、贴住上/下边、且不含整屏 `<canvas>` | ✅ 不认任何类名 |
 | ③ 宿主层 | siyuan-localfs 的 `src/purify.js` | 同源时往 iframe 注入 CSS | ✅ 但跨源无效 |
 
@@ -129,7 +129,7 @@ M 明显变小、或边缘检出残留外壳，就去 `docs/` 里翻 `screenshot
   删掉任何一层都会让某些场景退化。
 
 > ★ 为什么不给 `MlCadViewer` 传 prop 来隐藏 ★
->   上游 1.7.5 **没有**任何隐藏外壳的官方 prop（`MlCadViewer.vue.d.ts` 的 Props 里
+>   上游 1.7.6 **没有**任何隐藏外壳的官方 prop（`MlCadViewer.vue.d.ts` 的 Props 里
 >   只有 `disableExport` 这类"功能裁剪"）。所以只能藏 DOM。
 >   将来若上游补了官方开关，优先改用官方 prop，并把 ① ② 降级为兼容旧版本。
 
@@ -162,7 +162,7 @@ M 明显变小、或边缘检出残留外壳，就去 `docs/` 里翻 `screenshot
                               ^^^^^^^^^^^^^^^ 同源与跨源都生效
 ```
 
-- **本应用侧**：`src/bare.ts` + `src/bare.css`（见 §1.5 / §1.6 的三层兜底）
+- **本应用侧**：`src/bare.ts` + `src/style.css`（见 §1.5 / §1.6 的三层兜底）
 - **插件侧**：`siyuan-localfs` 的 `api.js` 里 `cadViewerUrl(path, bare)`，
   内嵌传 `true` 拼 `bare=1`；「在浏览器中打开」传 `false` 保持完整界面
   （新标签页里用户可能想用图层/测量/导出）。
@@ -201,7 +201,7 @@ storageKey: isBareMode ? 'fnos.dwg.viewer.settings.bare' : 'fnos.dwg.viewer.sett
 
 | 文件 | 字段 |
 |---|---|
-| `package.json` | `version`（当前 1.7.5） |
+| `package.json` | `version`（当前 1.7.6） |
 | `fnos-package/manifest` | `version` |
 | （若已发版）GitHub Release tag | `v1.7.x` |
 
