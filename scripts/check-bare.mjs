@@ -2,14 +2,14 @@
  * 裸模式自检（?bare=1）—— 打开一张真图纸，断言工具栏真的不见了。
  *
  * ★ 为什么需要这个脚本 ★
- *   隐藏外壳靠的是**类名**（src/bare.css）。上游 @mlightcad 哪天改了类名，
+ *   隐藏外壳靠的是**类名**（src/style.css 里 html[data-fnos-bare] 那一组规则）。上游 @mlightcad 哪天改了类名，
  *   净化就会**静默失效**：不报错、构建照过、FPK 照装，
  *   只有用户在思源嵌入块里才看到"工具栏全回来了"。
  *   这个脚本把那次肉眼比对变成一条命令，让升级流程里能自动发现回归。
  *
  * 它同时做两件事：
  *   1) **断言**：裸模式打开时，视口四边不该有任何可见的外壳元素；
- *   2) **报告**：枚举真实 DOM 里所有 ml-* 类名，跟 bare.css 的选择器清单
+ *   2) **报告**：枚举真实 DOM 里所有 ml-* 类名，跟 style.css 的选择器清单
  *      逐个比对，打印"哪些规则打空了""哪些类名是新出现的没被覆盖"。
  *      —— 第 2 条才是给升级者看的诊断信息。
  *
@@ -118,13 +118,13 @@ function connect(wsUrl) {
 }
 
 /**
- * 从 src/bare.css 里解析出"按类名隐藏"那份清单。
+ * 从 src/style.css 里解析出"按类名隐藏"那份清单。
  *
  * 刻意**解析源文件**而不是在这里复写一份：复写就等于有了两个真相来源，
  * 改了一处忘了另一处，诊断信息就成了假绿。
  */
 function readHiddenClassList() {
-  const css = fs.readFileSync(path.join(ROOT, 'src', 'bare.css'), 'utf8')
+  const css = fs.readFileSync(path.join(ROOT, 'src', 'style.css'), 'utf8')
   const set = new Set()
   // 取所有 html[data-fnos-bare] 前缀、且声明了 display:none 的块
   const hideBlocks = css.match(/html\[data-fnos-bare\][^{}]*\{[^}]*\}/g) || []
@@ -401,7 +401,7 @@ try {
   const present = new Set(report.classes)
   const used = declared.filter((c) => present.has(c))
   const idle = declared.filter((c) => !present.has(c))
-  console.log('\n【诊断：bare.css 选择器 vs 真实 DOM】')
+  console.log('\n【诊断：style.css 选择器 vs 真实 DOM】')
   info(`清单 ${declared.length} 条，本次命中 ${used.length} 条`)
   if (idle.length) {
     info('未命中（多为留作无损的候选，也可能是上游已改名）：')
